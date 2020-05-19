@@ -9,7 +9,23 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+resources:
+  repositories:
+  - repository: ue4
+    type: github
+    endpoint: switchcase-build
+    name: SwitchCaseGroup/interactivefitness-expressogame-unrealengine
+    ref: refs/tags/4.25.0-release
+  - repository: self
+    clean: true
+
 steps:
+- checkout: self
+  clean: true
+- checkout: ue4
+  fetchDepth: 1
+  path: UnrealEngine
+
 - script: echo Hello, world!
   displayName: 'Run a one-line script'
 
