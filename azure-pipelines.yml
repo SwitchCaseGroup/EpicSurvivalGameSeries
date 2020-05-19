@@ -22,14 +22,20 @@ resources:
 steps:
 - checkout: self
   clean: true
+  path: Game
 - checkout: ue4
   fetchDepth: 1
   path: UnrealEngine
 
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+- script: |
+    cd $(Agent.BuildDirectory)/UnrealEngine
+    ./Setup.sh
+    ./GenerateProjectFiles.sh
+  displayName: 'Unreal Engine Setup'
 
 - script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    cd $(Agent.BuildDirectory)/UnrealEngine
+    mkdir "$(Agent.BuildDirectory)/Game/SurvivalGame/Build"
+    Engine/Build/BatchFiles/Linux/Build.sh ShaderCompileWorker Linux Development
+    Engine/Build/BatchFiles/RunUAT.sh BuildCookRun -Project="$(Agent.BuildDirectory)/Game/SurvivalGame/SurvivalGame.uproject" -NoP4 -Distribution -TargetPlatform=Linux -Platform=Linux -ClientConfig=Shipping -ServerConfig=Shipping -Cook -Build -Stage -Pak -Archive -ArchiveDirectory="$(Agent.BuildDirectory)/Game/SurvivalGame/Build" -Rocket -Prereqs -Package
+  displayName: 'Build UE4 Game'
